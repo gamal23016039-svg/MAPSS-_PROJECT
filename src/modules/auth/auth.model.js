@@ -1,5 +1,50 @@
-/**
- * - Auth module model responsibilities: describe authentication-related user fields,
- *   identity constraints, and any OTP recovery data or indexes needed with the user model.
- * - Never store plaintext passwords; use bcrypt hashes.
- */
+const mongoose = require("mongoose");
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    nationalId: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+
+    phone: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+    },
+    confirmpassword: {
+      type: String,
+      required: true,
+    },
+
+    role: {
+      type: String,
+      required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Patient", PatientSchema);
