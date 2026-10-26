@@ -1,6 +1,38 @@
-/**
- * - Notifications module model: define delivery-job state, appointment/user references,
- *   retry metadata, and failure details where persistence is needed.
- * - Keep delivery attempts separate from booking transactions and avoid storing unnecessary
- *   sensitive message content.
- */
+
+const mongoose = require("mongoose");
+
+const notificationSchema = new mongoose.Schema(
+  {
+    appointmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Appointment",
+      required: true,
+    },
+
+    channel: {
+      type: String,
+      required: true,
+    },
+
+    type: {
+      type: String,
+      required: true,
+    },
+
+    status: {
+      type: String,
+      required: true,
+    },
+
+    sentAt: {
+      type: Date,
+    },
+
+    errorMessage: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Notification", notificationSchema);
