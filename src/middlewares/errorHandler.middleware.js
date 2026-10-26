@@ -1,12 +1,16 @@
-
+const AppError = require("../utils/AppError");
 const errorHandler = (err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-
-  res.status(statusCode).json({
-    status: "fail",
-    statusCode,
-    message: err.message || "Internal Server Error",
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      msg: err.message,
+    });
+  }
+  console.error(err);
+  return res.status(500).json({
+    status: "error",
+    msg: "Internal server error",
   });
 };
 
-export default errorHandler;
+module.exports = errorHandler;
