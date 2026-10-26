@@ -1,5 +1,41 @@
-/**
- * - Doctors module model: define doctor information, references to clinics and specialties,
- *   activation status, constraints, indexes, and timestamps.
- * - Keep filtering and assignment policy in services.
- */
+
+const mongoose = require("mongoose");
+
+const doctorSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    clinicIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Clinic",
+        required: true,
+      },
+    ],
+
+    specialtyIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Specialty",
+        required: true,
+      },
+    ],
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Doctor", doctorSchema);

@@ -1,5 +1,25 @@
-/**
- * - Clinics module model: define MongoDB clinic fields, constraints, indexes, timestamps,
- *   and relationships to assigned doctors or shifts as appropriate.
- * - Keep activation policy and data operations in services.
- */
+const mongoose = require("mongoose");
+
+const clinicSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    specialtyIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Specialty",
+        required: true,
+      },
+    ],
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Clinic", clinicSchema);
