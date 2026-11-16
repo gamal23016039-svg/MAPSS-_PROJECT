@@ -1,31 +1,32 @@
 const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    FirstName: {
       type: String,
       required: true,
       trim: true,
     },
-
+      LastName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     nationalId: {
       type: String,
       required: true,
       unique: true,
       trim: true,
     },
-
     phone: {
       type: String,
       required: true,
       trim: true,
     },
-
     email: {
       type: String,
       trim: true,
       lowercase: true,
     },
-
     password: {
       type: String,
       required: true,
@@ -34,7 +35,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     role: {
       type: String,
       required: true,
@@ -43,6 +43,16 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    hashOTP: {
+      type: String,
+        },
+    expiredate:{
+      type:Date
+    },
+    isOTPverified: {
+      type: Boolean,
+      default: false,
+    }
   },
   { timestamps: true }
 );

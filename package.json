@@ -10,7 +10,8 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "seed:admin": "node seeders/admin.seeder.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -21,7 +22,11 @@
     "mongoose": "^9.11.4",
     "node": "^26.12.1",
     "nodemon": "^3.1.14",
+    "swagger-ui-express": "^5.0.1",
     "token": "^0.1.0",
     "web": "^0.0.2"
+  },
+  "devDependencies": {
+    "@types/swagger-ui-express": "^4.1.8"
   }
 }

@@ -1,4 +1,6 @@
+
 const mongoose = require("mongoose");
+
 const specialtySchema = new mongoose.Schema(
   {
     name: {
@@ -11,6 +13,11 @@ const specialtySchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }
