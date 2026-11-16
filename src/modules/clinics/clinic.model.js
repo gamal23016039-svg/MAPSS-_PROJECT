@@ -16,10 +16,15 @@ const clinicSchema = new mongoose.Schema(
     ],
     isActive: {
       type: Boolean,
-      default: false
+      default: true,
     },
   },
   { timestamps: true }
+);
+
+clinicSchema.index(
+  { name: 1 },
+  { unique: true, collation: { locale: "en", strength: 2 } }
 );
 
 module.exports = mongoose.model("Clinic", clinicSchema);
