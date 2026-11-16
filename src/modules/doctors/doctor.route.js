@@ -1,5 +1,31 @@
-/**
- * - Doctors module routes: define doctor management and filtering endpoints with HTTP
- *   methods, JWT authentication, applicable role authorization, validation middleware, and
- *   controller handlers.
- */
+
+const express = require("express");
+const Router = express.Router();
+
+const doctorController = require("./doctor.controller");
+const { verifytoken } = require("../../middlewares/jwt.middleware");
+const { allowTo } = require("../../middlewares/allowto");
+
+
+Router.post(
+  "/",
+  verifytoken,
+  allowTo("Admin"),
+  doctorController.createDoctor
+);
+
+Router.get(
+  "/",
+  verifytoken,
+   allowTo("Admin"),
+  doctorController.getDoctors
+);
+
+Router.patch(
+  "/:id",
+  verifytoken,
+   allowTo("Admin"),
+  doctorController.updateDoctor
+);
+
+module.exports = Router;

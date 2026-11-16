@@ -1,0 +1,898 @@
+
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "MAPSS API",
+    "description": "Medical Appointment and Patient Scheduling System - Hospital of October 6 University. Draft API documentation for team review.",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/api/v1",
+  "schemes": ["http", "https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter: Bearer <token>"
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a patient",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisterRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Patient registered successfully",
+            "schema": {
+              "$ref": "#/definitions/AuthResponse"
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "409": {
+            "description": "Email or phone already exists",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "$ref": "#/definitions/AuthResponse"
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Refresh access token",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RefreshTokenRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token refreshed",
+            "schema": {
+              "$ref": "#/definitions/TokenResponse"
+            }
+          },
+          "401": {
+            "description": "Invalid refresh token",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current user",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/clinics": {
+      "get": {
+        "tags": ["Clinics"],
+        "summary": "Get all clinics",
+        "responses": {
+          "200": {
+            "description": "Clinics list",
+            "schema": {
+              "$ref": "#/definitions/ClinicsResponse"
+            }
+          }
+        }
+      }
+    },
+    "/clinics/{clinicId}": {
+      "get": {
+        "tags": ["Clinics"],
+        "summary": "Get clinic by ID",
+        "parameters": [
+          {
+            "name": "clinicId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Clinic details",
+            "schema": {
+              "$ref": "#/definitions/ClinicResponse"
+            }
+          },
+          "404": {
+            "description": "Clinic not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/doctors": {
+      "get": {
+        "tags": ["Doctors"],
+        "summary": "Get doctors",
+        "parameters": [
+          {
+            "name": "clinicId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Doctors list",
+            "schema": {
+              "$ref": "#/definitions/DoctorsResponse"
+            }
+          }
+        }
+      }
+    },
+    "/doctors/{doctorId}": {
+      "get": {
+        "tags": ["Doctors"],
+        "summary": "Get doctor details",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Doctor details",
+            "schema": {
+              "$ref": "#/definitions/DoctorResponse"
+            }
+          },
+          "404": {
+            "description": "Doctor not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/appointments": {
+      "get": {
+        "tags": ["Appointments"],
+        "summary": "Get appointments for current user",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED", "NO_SHOW"]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appointments list",
+            "schema": {
+              "$ref": "#/definitions/AppointmentsResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Appointments"],
+        "summary": "Create appointment",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateAppointmentRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Appointment created",
+            "schema": {
+              "$ref": "#/definitions/AppointmentResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid appointment data",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "409": {
+            "description": "Shift is full or booking conflict",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/appointments/{appointmentId}": {
+      "get": {
+        "tags": ["Appointments"],
+        "summary": "Get appointment details",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "appointmentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appointment details",
+            "schema": {
+              "$ref": "#/definitions/AppointmentResponse"
+            }
+          },
+          "404": {
+            "description": "Appointment not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/appointments/{appointmentId}/cancel": {
+      "patch": {
+        "tags": ["Appointments"],
+        "summary": "Cancel appointment",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "appointmentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appointment cancelled",
+            "schema": {
+              "$ref": "#/definitions/AppointmentResponse"
+            }
+          },
+          "404": {
+            "description": "Appointment not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "409": {
+            "description": "Cancellation is not allowed",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/queue": {
+      "get": {
+        "tags": ["Queue"],
+        "summary": "Get queue",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "clinicId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Queue list",
+            "schema": {
+              "$ref": "#/definitions/QueueResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/payments": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Record a cash payment",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreatePaymentRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Payment recorded",
+            "schema": {
+              "$ref": "#/definitions/PaymentResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid payment data",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Appointment not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/admin/health": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Check API health",
+        "responses": {
+          "200": {
+            "description": "API is running",
+            "schema": {
+              "$ref": "#/definitions/HealthResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "RegisterRequest": {
+      "type": "object",
+      "required": ["fullName", "email", "password", "phone"],
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "example": "Ahmed Mohamed"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "format": "password"
+        },
+        "phone": {
+          "type": "string"
+        }
+      }
+    },
+    "LoginRequest": {
+      "type": "object",
+      "required": ["email", "password"],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "format": "password"
+        }
+      }
+    },
+    "RefreshTokenRequest": {
+      "type": "object",
+      "required": ["refreshToken"],
+      "properties": {
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateAppointmentRequest": {
+      "type": "object",
+      "required": ["clinicId", "doctorId", "shiftId"],
+      "properties": {
+        "clinicId": {
+          "type": "string"
+        },
+        "doctorId": {
+          "type": "string"
+        },
+        "shiftId": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "CreatePaymentRequest": {
+      "type": "object",
+      "required": ["appointmentId", "amount", "method"],
+      "properties": {
+        "appointmentId": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number",
+          "format": "double"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["CASH"]
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "fullName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["PATIENT", "CALL_CENTER_AGENT", "RECEPTIONIST", "DOCTOR", "DEPARTMENT_MANAGER", "ADMIN", "SYSTEM_ADMIN"]
+        }
+      }
+    },
+    "Clinic": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "Doctor": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "fullName": {
+          "type": "string"
+        },
+        "specialty": {
+          "type": "string"
+        },
+        "clinicId": {
+          "type": "string"
+        }
+      }
+    },
+    "Appointment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "patientId": {
+          "type": "string"
+        },
+        "doctorId": {
+          "type": "string"
+        },
+        "clinicId": {
+          "type": "string"
+        },
+        "shiftId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED", "NO_SHOW"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "QueueItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "appointmentId": {
+          "type": "string"
+        },
+        "queueNumber": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["WAITING", "CALLED", "IN_CONSULTATION", "COMPLETED", "SKIPPED", "CANCELLED"]
+        }
+      }
+    },
+    "Payment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "appointmentId": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["CASH"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "SuccessResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": false
+        },
+        "message": {
+          "type": "string"
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "details": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "AuthResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "user": {
+              "$ref": "#/definitions/User"
+            },
+            "accessToken": {
+              "type": "string"
+            },
+            "refreshToken": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "TokenResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "accessToken": {
+              "type": "string"
+            },
+            "refreshToken": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "UserResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "data": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "ClinicResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "data": {
+          "$ref": "#/definitions/Clinic"
+        }
+      }
+    },
+    "ClinicsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Clinic"
+          }
+        }
+      }
+    },
+    "DoctorResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "data": {
+          "$ref": "#/definitions/Doctor"
+        }
+      }
+    },
+    "DoctorsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Doctor"
+          }
+        }
+      }
+    },
+    "AppointmentResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "data": {
+          "$ref": "#/definitions/Appointment"
+        }
+      }
+    },
+    "AppointmentsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Appointment"
+          }
+        }
+      }
+    },
+    "QueueResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/QueueItem"
+          }
+        }
+      }
+    },
+    "PaymentResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "data": {
+          "$ref": "#/definitions/Payment"
+        }
+      }
+    },
+    "HealthResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string",
+          "example": "MAPSS API is running"
+        }
+      }
+    }
+  }
+}
